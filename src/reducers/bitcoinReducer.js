@@ -1,22 +1,22 @@
-import { GET_POSTS, ADD_POSTS } from "../actions/types";
+import { GET_ACCOUNT, MAKE_PAYMENT } from "../actions/types";
 
 const initialState = {
-  post: ["posts1"],
-  todos: []
+  account: ["acount_test"]
+  // todos: []
 };
 
 export default (state = initialState, action) => {
   switch (action.type) {
-    case GET_POSTS:
+    case GET_ACCOUNT:
       return {
         ...state,
-        post: [...state.post]
+        post: [...state.account]
       };
-      case ADD_POSTS:
+    case MAKE_PAYMENT:
       return {
         ...state,
-        post:[...state.post, action.payload]
-      }
+        post: [...state.account, action.payload]
+      };
 
     default:
       // For now, don't handle any actions
