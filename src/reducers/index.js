@@ -1,6 +1,6 @@
 import { combineReducers } from "redux";
-import postReducer from "./postReducer";
+import btcReducer from "./bitcoinReducer";
 
 export default combineReducers({
-  post: postReducer
+  post: btcReducer
 });
