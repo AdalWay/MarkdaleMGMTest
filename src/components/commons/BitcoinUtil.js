@@ -2,37 +2,7 @@ import axios from "axios";
 import validate from "bitcoin-address-validation";
 import { ECPair, networks, TransactionBuilder } from "bitcoinjs-lib";
 import buffer from "buffer";
-
-export function createTransaction() {
-  let testing = networks.testnet;
-
-  const addr = "mkQHzmRmERNGyN3A4cmrUNDu1CtDResXRv";
-  const pk = "93X17ouXMugC51LxiyrKNNg2Tsp5RSYGs7XfpMwTcwCNJZFkH7i";
-  const keys = ECPair.fromWIF(pk, testing);
-
-  //create transaction
-  let txb = new TransactionBuilder(testing);
-
-  //get previus transaction
-
-  txb.setVersion(1);
-  let txid = "6830bdf769c327907a6dbb36d0d32bc7da088f176a807285882d8644f6ad36d0";
-  let outn = 1;
-
-  //input
-  txb.addInput(txid, outn);
-
-  //output
-  txb.addOutput("mfZuYWz4ijedYSJssKgTzFPQbW96d3yT99", 90000);
-
-  let keypairSpend = keys;
-  txb.sign(0, keypairSpend);
-
-  let tx = txb.build();
-  let txhex = tx.toHex();
-  console.log(txhex);
-  return txhex;
-}
+import { saveTransaction } from "./DbUtil";
 
 export function isValidAddress(addresses) {
   if (validate(addresses)) {
@@ -47,19 +17,23 @@ export function isValidAddress(addresses) {
  * @param {number} amount - Bitcoin amount in BTC
  * @param {string} to - output Bitcoin wallet address
  * @param {string} from - input Bitcoin wallet address
- * @param {string} wif
+ *
  */
-export function sendPayment(from, to, wif, amount) {
+export function sendPayment(src, dest, amount) {
   const WIF = "93X17ouXMugC51LxiyrKNNg2Tsp5RSYGs7XfpMwTcwCNJZFkH7i";
-
   const keys = ECPair.fromWIF(WIF, networks.testnet);
+  // const testAddrtoSend = "mfZuYWz4ijedYSJssKgTzFPQbW96d3yT99";
+
+  //clean white space from the inpusts
+  const source = src.replace(/\s/g, "");
+  let destination = dest.replace(/\s/g, "");
+  const howMuch = parseFloat(amount);
 
   const newtx = {
     inputs: [{ addresses: ["mkQHzmRmERNGyN3A4cmrUNDu1CtDResXRv"] }],
-    outputs: [
-      { addresses: ["mfZuYWz4ijedYSJssKgTzFPQbW96d3yT99"], value: 100000 }
-    ]
+    outputs: [{ addresses: [destination], value: howMuch }]
   };
+  console.log(newtx);
 
   // create tx skeleton
   axios
@@ -79,13 +53,35 @@ export function sendPayment(from, to, wif, amount) {
           .toDER()
           .toString("hex");
       });
-      console.log(txs);
-
       // sending back the transaction with all the signatures to broadcast
       axios
         .post("https://api.blockcypher.com/v1/btc/test3/txs/send", txs)
         .then(function(finaltx) {
           console.log(finaltx);
+          return finaltx.data;
+        })
+        .then(function(data) {
+          console.log(data);
+          // save data in firebase
+
+          const amount = data.tx.outputs[0].value;
+          const src = data.tx.addresses[0];
+          const des = data.tx.addresses[1];
+          const hash = data.tx.hash;
+
+          const tranxInfo = {
+            srcAddr: src,
+            destAddr: des,
+            amount: amount,
+            hashcode: hash,
+            datetime: new Date()
+          };
+          console.log(tranxInfo);
+
+          saveTransaction(tranxInfo);
+        })
+        .catch(error => {
+          console.log("We have an error" + error);
         });
     });
 }

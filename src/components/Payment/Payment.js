@@ -1,16 +1,27 @@
 import React, { Component } from "react";
 import { Form } from "semantic-ui-react";
-export default class Payment extends Component {
-  handleChange = (e, { name, value }) => this.setState({ [name]: value });
+import { sendPayment } from "../commons/BitcoinUtil";
 
-  handleSubmit = () => {
-    //get the submitted data
-    const { makePayment } = this.props;
-    makePayment();
+export default class Payment extends Component {
+  state = {
+    srcAdr: " ",
+    destAdr: " ",
+    quantity: " "
+  };
+
+  handleSubmit = e => {
+    e.preventDefault();
+    const { srcAdr, destAdr, quantity } = this.props;
+
+    let amount = parseFloat(quantity);
+    console.log(srcAdr);
+    console.log(destAdr);
+    console.log(amount);
+    sendPayment(null, destAdr, amount);
   };
 
   render() {
-    const { srcAdr, destAdr, quantity } = this.props;
+    const { srcAdr, destAdr, quantity, handleChange } = this.props;
 
     return (
       <div>
@@ -20,16 +31,16 @@ export default class Payment extends Component {
             <Form.Input
               type="text"
               placeholder="source address"
-              name="source"
+              name="srcAdr"
               value={srcAdr}
-              onChange={this.handleChange}
+              onChange={handleChange}
             />
             <Form.Input
               type="text"
               placeholder="destination address"
-              name="dest"
+              name="destAdr"
               value={destAdr}
-              onChange={this.handleChange}
+              onChange={handleChange}
             />
             <Form.Input
               type="number"
@@ -37,7 +48,7 @@ export default class Payment extends Component {
               name="quantity"
               value={quantity}
               width={3}
-              onChange={this.handleChange}
+              onChange={handleChange}
             />
             <Form.Button content="Pay" />
           </Form.Group>

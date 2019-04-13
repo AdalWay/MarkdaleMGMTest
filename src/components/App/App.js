@@ -1,12 +1,9 @@
 import React, { Component } from "react";
 import "semantic-ui-css/semantic.min.css";
+
 import SearchAddress from "../SearchAddress/SearchAddress";
 import Payment from "../Payment/Payment";
-import {
-  isValidAddress,
-  getBalance,
-  sendPayment
-} from "../commons/BitcoinUtil";
+import { isValidAddress, getBalance } from "../commons/BitcoinUtil";
 import "./App.css";
 
 class App extends Component {
@@ -15,16 +12,14 @@ class App extends Component {
     disable: true,
     balance: 0,
     btcAccount: "",
-    srcAdr: "",
+    srcAdr: " ",
     destAdr: " ",
-    quantity: ""
+    quantity: " "
   };
 
-  
-  makePayment = async () => {
-    const transfer = await sendPayment();
-    console.log(transfer);
-  };
+  handleChange = (e, { name, value }) => this.setState({ [name]: value });
+
+  componentDidMount() {}
 
   getBtcBalance = async () => {
     //get the validated address from the state
@@ -52,7 +47,7 @@ class App extends Component {
             getBtcBalance={this.getBtcBalance}
           />
           <Payment
-            makePayment={this.makePayment}
+            handleChange={this.handleChange}
             srcAdr={this.state.srcAdr}
             destAdr={this.state.destAdr}
             quantity={this.state.quantity}
