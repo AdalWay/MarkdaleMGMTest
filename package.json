@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bigi": "^1.4.2",
     "bitcoin-address-validation": "^0.2.6",
     "bitcoinjs-lib": "3.3.2",
